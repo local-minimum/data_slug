@@ -108,18 +108,11 @@ def register_routes(app):
     def root():
 
         project_connector = app.db[""]
+        # Project with not name is the super-project
 
         if users.has_any_users(project_connector):
-            return "Has users"
-
-        return "Has no users"
-
-    @app.route("/logout", methods=("post", ))
-    def logout():
-
-        pass
-
-    @app.route("/login", methods=("post",))
-    def login():
-
-        pass
+            # TODO: Return dashbord if logged in else some about?
+            return ""
+        else:
+            # TODO: Return setup owner user page
+            return "Has no users"
