@@ -4,15 +4,21 @@ import sql_commands
 __USER_TABLE = "Users"
 
 
-def has_any_users(app, project=""):
+def has_any_users(project_connector):
 
-    cursor = app.db.cursor
-    if cursor:
+    with project_connector as conn:
 
-        try:
-            return cursor.select(
-                sql_commands.table_has_any,
-                app.db.get_table(__USER_TABLE, project)) == "TRUE"
-        except mariadb.Error:
-            return False
+        cursor = conn.cursor
+
+        if cursor:
+
+            try:
+
+                return cursor.select(
+                    sql_commands.table_has_any,
+                    project_connector.get_table(__USER_TABLE)) == "TRUE"
+
+            except mariadb.Error:
+
+                return False
     return False
