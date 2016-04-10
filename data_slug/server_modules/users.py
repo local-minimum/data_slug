@@ -6,19 +6,23 @@ __USER_TABLE = "Users"
 
 def has_any_users(project_connector):
 
+    """
+
+    :type project_connector: core.ProjectConnector
+    """
     with project_connector as conn:
 
         cursor = conn.cursor
-
-        if cursor:
-
+        if cursor is not None:
             try:
 
-                return cursor.select(
+                cursor.execute(
                     sql_commands.table_has_any,
-                    project_connector.get_table(__USER_TABLE)) == "TRUE"
+                    (project_connector.get_table_name(__USER_TABLE),))
 
-            except mariadb.Error:
-
+            except mariadb.Error, e:
+                print "No table"
                 return False
+
+            return cursor.fetchone() == "TRUE"
     return False
