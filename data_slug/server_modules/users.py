@@ -15,6 +15,4 @@ def has_any_users(app, project=""):
                 app.db.get_table(__USER_TABLE, project)) == "TRUE"
         except mariadb.Error:
             return False
-        else:
-            return True
     return False
