@@ -17,6 +17,7 @@ if __name__ == "__main__":
 
     app = get_app(debug=__DEBUG)
 
+    core.monkey_patch_app(app)
     core.register_routes(app)
 
     app.run(host="127.0.0.1" if __LOCAL else "0.0.0.0", port=__PORT)
