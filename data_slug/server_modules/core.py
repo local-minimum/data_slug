@@ -4,8 +4,15 @@ import warnings
 import users
 
 __DB_USER = "data_slugger"
-__DB_PWD = "hellokitty"
+__DB_PWD = "ataminimumyouneedtochangethis"
 __DB = "data_slug"
+
+"""SQL commands that go with above settings (but change password!)
+
+CREATE DATABASE IF NOT EXISTS data_slug;
+CREATE USER 'data_slugger'@'localhost' IDENTIFIED WITH 'ataminimumyouneedtochangethis';
+GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON data_slug.* TO 'data_slugger'@'localhost';
+"""
 
 
 class ProjectConnector(object):
@@ -32,6 +39,8 @@ class ProjectConnector(object):
             warnings.warn("Connection is already active, can't have two at a the same time")
             raise mariadb.Error(msg="Previous connection not closed")
 
+        return self
+
     def __exit__(self, exc_type, exc_val, exc_tb):
 
         if exc_type is None:
@@ -42,10 +51,10 @@ class ProjectConnector(object):
             self.__connection = None
             warnings.warn("Connection Error {0}: ({1})".format(exc_val, exc_tb))
 
-    def get_table_name(self, table, project_name=""):
+    def get_table_name(self, table):
 
-        if project_name:
-            table = "_".join((project_name, table))
+        if self.__project:
+            table = "_".join((self.__project, table))
         if self.__connection_data.table_prefix:
             table = "_".join((self.__connection_data.table_prefix, table))
         return table
@@ -58,6 +67,10 @@ class ProjectConnector(object):
     @property
     def cursor(self):
 
+        """
+
+        :rtype: mysql.connector.cursor.MySQLCursor
+        """
         if self.__connection:
             return self.__connection.cursor()
         return None
@@ -94,12 +107,12 @@ def register_routes(app):
     @app.route("/")
     def root():
 
-        project_connector = app.db["dev"]
+        project_connector = app.db[""]
 
         if users.has_any_users(project_connector):
-            pass
+            return "Has users"
 
-        return "Hello"
+        return "Has no users"
 
     @app.route("/logout", methods=("post", ))
     def logout():
