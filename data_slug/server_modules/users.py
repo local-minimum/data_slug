@@ -24,9 +24,9 @@ def has_any_users(project_connector):
 
     :type project_connector: core.ProjectConnector
     """
-    with project_connector as conn:
+    with project_connector as connection:
 
-        cursor = conn.cursor
+        cursor = connection.cursor()
         if cursor is not None:
             try:
 
@@ -71,9 +71,9 @@ def add_user(project_connector, user_name, user_type, user_password):
 
         return False
 
-    with project_connector as conn:
+    with project_connector as connection:
 
-        cursor = conn.cursor
+        cursor = connection.cursor()
 
         if cursor is None:
 
