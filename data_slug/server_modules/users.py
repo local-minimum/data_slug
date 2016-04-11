@@ -104,9 +104,19 @@ def add_user(project_connector, user_name, user_type, user_password):
             return True
 
 
+def set_password_validification(app):
+
+    @app.auth.verify_password
+    def validate_password(username, password):
+
+        # TODO: Figure out out to validate with different scopes
+        return True
+
+
 def register_routes(app):
 
     @app.route("/users/logout", methods=("POST", "GET"))
+    @app.auth.login_required
     def logout():
 
         return "Good-bye"

@@ -14,7 +14,6 @@ CREATE USER 'data_slugger'@'localhost' IDENTIFIED WITH 'ataminimumyouneedtochang
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON data_slug.* TO 'data_slugger'@'localhost';
 """
 
-
 class ProjectConnector(object):
 
     def __init__(self, connection_data, project):
@@ -86,7 +85,7 @@ class ConnectionData(object):
         return ProjectConnector(self, project)
 
 
-def monkey_patch_app(app):
+def set_database_connector(app):
 
     app.db = ConnectionData(__DB_USER, __DB_PWD, __DB)
 

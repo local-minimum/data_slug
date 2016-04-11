@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 from flask import Flask
+from flask.ext.httpauth import HTTPBasicAuth
+
 from server_modules import core
 from server_modules import users
 
@@ -12,8 +14,10 @@ def get_app(debug=False):
 
     app = Flask("Data Slug Server")
     app.debug = debug
+    app.auth = HTTPBasicAuth()
 
-    core.monkey_patch_app(app)
+    core.set_database_connector(app)
+    users.set_password_validification(app)
 
     core.register_routes(app)
     users.register_routes(app)
