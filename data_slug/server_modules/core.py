@@ -39,7 +39,7 @@ class ProjectConnector(object):
             warnings.warn("Connection is already active, can't have two at a the same time")
             raise mariadb.Error(msg="Previous connection not closed")
 
-        return self
+        return self.__connection
 
     def __exit__(self, exc_type, exc_val, exc_tb):
 
@@ -63,17 +63,6 @@ class ProjectConnector(object):
     def connected(self):
 
         return self.__connection is not None
-
-    @property
-    def cursor(self):
-
-        """
-
-        :rtype: mysql.connector.cursor.MySQLCursor
-        """
-        if self.__connection:
-            return self.__connection.cursor()
-        return None
 
 
 class ConnectionData(object):
