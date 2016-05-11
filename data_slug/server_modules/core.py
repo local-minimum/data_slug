@@ -1,7 +1,15 @@
 import mysql.connector as mariadb
 import warnings
+from flask import send_from_directory, redirect
+import os
+import project
 
-import users
+__STATIC_DIRECTORY = "static"
+__JS_DIRECTORY = os.path.join(__STATIC_DIRECTORY, "js")
+__IMAGE_DIRECTORY = os.path.join(__STATIC_DIRECTORY, "image")
+__CSS_DIRECTORY = os.path.join(__STATIC_DIRECTORY, "css")
+__HTML_DIRECTORY = os.path.join(__STATIC_DIRECTORY, "html")
+__TEMPLATE_DIRECTORY = "templates"
 
 __DB_USER = "data_slugger"
 __DB_PWD = "ataminimumyouneedtochangethis"
@@ -13,6 +21,7 @@ CREATE DATABASE IF NOT EXISTS data_slug;
 CREATE USER 'data_slugger'@'localhost' IDENTIFIED WITH 'ataminimumyouneedtochangethis';
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP ON data_slug.* TO 'data_slugger'@'localhost';
 """
+
 
 class ProjectConnector(object):
 
@@ -74,7 +83,6 @@ class ConnectionData(object):
         self.table_prefix = ""
 
     def __getitem__(self, project):
-
         """
 
         :param project: Name of the project to work with
@@ -95,12 +103,39 @@ def register_routes(app):
     @app.route("/")
     def root():
 
-        project_connector = app.db[""]
         # Project with not name is the super-project
 
-        if users.has_any_users(project_connector):
-            # TODO: Return dashbord if logged in else some about?
-            return ""
+        if not project.is_setup():
+            return redirect("/static/html/register_owner.html")
+
+        elif not project.has_any_project():
+            return redirect("/static/html/create_project.html")
+
+        elif not "logged in":
+            # TODO: Implement this
+            public_projects = project.get_all_public_projects()
+            return public_projects
+
         else:
-            # TODO: Return setup owner user page
-            return "Has no users"
+            # TODO: Stitch dashboard, and projects something
+            return None
+
+    @app.route("/static/js/<js_file>")
+    def get_js_file(js_file):
+
+        return send_from_directory(__JS_DIRECTORY, js_file)
+
+    @app.route("/static/image/<image_file>")
+    def get_image_file(image_file):
+
+        return send_from_directory(__IMAGE_DIRECTORY, image_file)
+
+    @app.route("/static/css/<css_file>")
+    def get_css_file(css_file):
+
+        return send_from_directory(__CSS_DIRECTORY, css_file)
+
+    @app.route("/static/html/<html_file>")
+    def get_html_file(html_file):
+
+        return send_from_directory(__HTML_DIRECTORY, html_file)

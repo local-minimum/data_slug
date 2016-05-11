@@ -6,7 +6,7 @@ from server_modules import core
 from server_modules import users
 
 __LOCAL = True
-__PORT = 5000
+__PORT = 5050
 __DEBUG = True
 
 

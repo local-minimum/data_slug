@@ -85,10 +85,11 @@ def add_user(project_connector, user_name, user_type, user_password):
                 cursor.execute(
                     """CREATE TABLE IF NOT EXISTS %s
                         (user_id INT AUTO_INCREMENT PRIMARY_KEY,
-                         user_type INT,
+                         user_type INT[8],
                          user_name VARCHAR UNIQUE,
-                         user_password CHAR[64]
-                         user_password_seed CHAR[64]);""")
+                         user_password CHAR[64],
+                         user_password_seed CHAR[64],
+                         user_joined DATE);""", tuple(__USER_TABLE))
 
             except mariadb.Error:
                 print "Could not create user table"
@@ -98,7 +99,7 @@ def add_user(project_connector, user_name, user_type, user_password):
             password = hashlib.sha256(user_password + password_seed).hexdigest()
             cursor.execute(
                 """INSERT INTO %s (user_type, user_name, user_password, user_password_seed)
-                    VALUES (%i, %s, %s, %s);""", (user_type.value, user_name, password, password_seed))
+                    VALUES (%i, %s, %s, %s);""", (__USER_TABLE, user_type.value, user_name, password, password_seed))
 
             cursor.commit()
             return True
@@ -115,27 +116,27 @@ def set_password_validification(app):
 
 def register_routes(app):
 
-    @app.route("/users/logout", methods=("POST", "GET"))
+    @app.route("/api/user/logout", methods=("POST", "GET"))
     @app.auth.login_required
     def logout():
 
         return "Good-bye"
 
-    @app.route("/users/login", methods=("POST", "GET"))
+    @app.route("/api/user/login", methods=("POST", "GET"))
     def login():
 
         return "Hello"
 
-    @app.route("/users/add", defaults={'project': ""}, methods=("POST",))
-    @app.route("/users/add/", defaults={'project': ""}, methods=("POST",))
-    @app.route("/<project>/users/add", methods=("POST",))
-    @app.route("/<project>/users/add/", methods=("POST",))
+    @app.route("/api/user/add", defaults={'project': ""}, methods=("POST", "GET"))
+    @app.route("/api/user/add/", defaults={'project': ""}, methods=("POST", "GET"))
+    @app.route("/api/user/<project>/add", methods=("POST", "GET"))
+    @app.route("/api/users/<project>/add/", methods=("POST", "GET"))
     def add(project):
 
         global_connector = app.db[""]
         project_connector = app.db[project]
 
-        lvl = UserTypes.owner if (not has_any_users(global_connector) and not has_any_users(project_connector)) else \
+        lvl = UserTypes.owner if (not has_any_users(global_connector) or not has_any_users(project_connector)) else \
             UserTypes.requested
 
         success = add_user(
